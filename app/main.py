@@ -17,7 +17,7 @@ from .validation import deflated_sharpe_ratio,probabilistic_sharpe_ratio,bootstr
 from .sync_manager import create_sync,run_sync,snapshot
 from .config import settings
 
-app=FastAPI(title="AltAlpha Terminal",version="0.7.0")
+app=FastAPI(title="AltAlpha Terminal",version="0.8.0")
 STATIC=Path(__file__).parent/"static"
 app.mount("/static",StaticFiles(directory=STATIC),name="static")
 
@@ -40,7 +40,7 @@ def db():
 @app.get("/")
 def terminal(): return FileResponse(STATIC/"index.html")
 @app.get("/health")
-def health():return {"ok":True,"version":"0.7.0"}
+def health():return {"ok":True,"version":"0.8.0"}
 
 @app.get("/events")
 def events(source:str|None=None,ticker:str|None=None,limit:int=100,s:Session=Depends(db)):
