@@ -1,0 +1,22 @@
+name: altalpha-production
+start: "2020-01-01"
+end: "2026-01-01"
+initial_capital: 100000
+benchmark: SPY
+sources: [sec_form4, congress_house, congress_senate, lda, usaspending, options_flow, finra_short_interest, sec_companyfacts]
+signal_lookback_days: 30
+threshold: 2.5
+holding_days: 20
+max_position: 0.10
+transaction_cost_bps: 5
+slippage_bps: 5
+long_short: true
+weights:
+  sec_form4: 1.5
+  congress_house: 1.2
+  congress_senate: 1.2
+  lda: 0.4
+  usaspending: 1.0
+  options_flow: 1.0
+  finra_short_interest: -0.8
+  sec_companyfacts: 0.8
