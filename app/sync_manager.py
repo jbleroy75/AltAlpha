@@ -73,10 +73,10 @@ def run_sync(run_id:int):
                     for a in aliases[:15]:inserted+=collect(s,a.alias,a.ticker)
                 elif source=="congress_house":
                     from .collectors.congress_public import collect
-                    inserted=collect(s,"house",90,2)
+                    inserted=collect(s,"house",90,1,50)
                 elif source=="congress_senate":
                     from .collectors.congress_public import collect
-                    inserted=collect(s,"senate",90,2)
+                    inserted=collect(s,"senate",90,1,50)
                 elif source=="uspto":
                     p=_first_existing("patents.csv","uspto.csv")
                     if p:
