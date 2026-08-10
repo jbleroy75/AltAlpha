@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/static/v07.css">
 </head>
 <body>
-<header><div><b>ALT<span>ALPHA</span></b><small> Quant Research Terminal</small></div><div class="status" id="status">● API</div></header>
+<header><div><b>ALT<span>ALPHA</span></b><small> Quant Research Terminal</small></div><div><span class="status" id="status">● API</span><small> · Congress data gateway: Bargo / official filings</small></div></header>
 <nav><button data-tab="overview">Overview</button><button data-tab="signals">Signals</button><button data-tab="backtest">Backtest</button><button data-tab="risk">Risk</button><button data-tab="discovery">Alpha Discovery</button><button data-tab="data">Data Sources</button><input id="tickerSearch" placeholder="Ticker (ex. NVDA)"><button id="tickerBtn">Open</button></nav>
 <main>
 <section id="overview"><div class="hero"><div><h1>Quant Research Overview</h1><p>Point-in-time alternative data → signals → portfolio → validation.</p></div><div class="pill">RESEARCH MODE</div></div><div class="syncbar"><div><strong>Data synchronization</strong><span id="syncSummary" class="muted">No sync run yet.</span></div><button class="primary" id="syncAllBtn">SYNC ALL DATA</button></div><div id="syncStatus"></div><div class="metrics" id="overviewMetrics"></div><div class="two"><div><h2>Equity curve — latest run</h2><div class="panel"><svg id="equityChart" viewBox="0 0 800 260" role="img"></svg></div></div><div><h2>Latest signals</h2><div id="latestSignals"></div></div></div></section>
