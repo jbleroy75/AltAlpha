@@ -1,0 +1,15 @@
+AltAlpha — Third-Party Data & Service Notice
+
+Copyright (c) 2026 Jean-Baptiste Leroy.
+
+AltAlpha source code is licensed under the MIT License. That license applies to the software authored for this repository; it does not grant rights to third-party datasets, APIs, trademarks, filings, feeds, market data, or other external content.
+
+AltAlpha can connect to, parse, or ingest information originating from third-party or public-sector sources including, depending on configuration, SEC EDGAR, US House and Senate disclosure systems, the Lobbying Disclosure Act API, USAspending, USPTO systems, FINRA data, Google Trends, Bluesky, flight-data sources, pricing providers, and user-supplied exports.
+
+Users are responsible for complying with each source's current terms of use, rate limits, attribution requirements, redistribution restrictions, licensing conditions, privacy requirements, and applicable law.
+
+This repository does not include or redistribute proprietary historical market-data databases, commercial options-flow datasets, licensed flight-history datasets, or other datasets for which redistribution rights have not been established.
+
+Names and trademarks of third parties remain the property of their respective owners. Their mention describes interoperability or potential data sources and does not imply endorsement, affiliation, or sponsorship.
+
+AltAlpha is a research and educational framework. It is not investment advice, a broker, an execution venue, or a production trading system.
