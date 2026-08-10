@@ -202,6 +202,14 @@ AltAlpha deliberately does **not** claim institutional production infrastructure
 
 The current project is best viewed as a **quantitative research laboratory for alternative data**.
 
+## License & third-party data
+
+The AltAlpha source code is released under the **MIT License**. See `LICENSE`.
+
+The MIT License applies to the code authored for this repository, **not** to third-party datasets, APIs, trademarks, filings or commercial market-data feeds. Users remain responsible for the terms, redistribution restrictions, attribution requirements and rate limits of each external source. See `NOTICE` for the third-party data and service notice.
+
+This repository does not intentionally redistribute proprietary historical market data, commercial options-flow datasets, licensed flight-history datasets or other third-party datasets without established redistribution rights.
+
 ## Interview summary
 
 > Built a Python-based quantitative research platform aggregating alternative datasets including insider transactions, congressional disclosures, institutional holdings, government contracts and options activity. Implemented point-in-time event normalization, multi-signal strategy construction, constrained portfolio backtesting, factor-risk analytics and walk-forward / multiple-testing-aware statistical validation, with a FastAPI research terminal for visualization.
