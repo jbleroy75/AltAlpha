@@ -1,21 +1,50 @@
 # AltAlpha Quant Terminal
 
-AltAlpha is a personal quantitative research platform for testing whether **alternative data contains persistent predictive information in public equities**.
+AltAlpha is a personal quantitative-research platform for testing whether **alternative data contains persistent predictive information in public equities**.
 
-It combines alternative-data ingestion, point-in-time normalization, multi-signal research, portfolio backtesting, risk modelling, statistical validation and a lightweight web terminal in one Python/FastAPI codebase.
+It combines alternative-data ingestion, point-in-time normalization, multi-signal research, portfolio backtesting, risk modelling, statistical validation and a responsive FastAPI web terminal.
 
-> **Status:** research framework / portfolio project. It is **not** a broker-connected execution system and should not be treated as an institutional market-data or risk-model replacement.
+> **Status:** research framework / portfolio project. AltAlpha is not a broker-connected execution system and is not a commercial market-data or risk-model replacement.
+
+## One-click local setup
+
+The default workflow is intentionally simple:
+
+```bash
+git clone https://github.com/jbleroy75/AltAlpha.git
+cd AltAlpha
+./start.sh
+```
+
+On **Windows**, double-click `start.bat`. On **macOS**, `start.command` can be launched from Finder.
+
+On the first run AltAlpha automatically:
+
+1. checks for Python 3.11+;
+2. creates an isolated `.venv`;
+3. installs **all Python dependencies** from `pyproject.toml`;
+4. creates `.env` from `.env.example`;
+5. initializes the database and import directories;
+6. starts the FastAPI terminal;
+7. opens `http://127.0.0.1:8000`;
+8. starts the first data synchronization in the background;
+9. bootstraps SEC ticker/CIK mappings for the configured watchlist;
+10. downloads five years of development price history for the watchlist plus SPY.
+
+The terminal also exposes **SYNC ALL DATA** for subsequent refreshes.
+
+To install without starting the server, run `./install.sh` on macOS/Linux or `install.bat` on Windows.
 
 ## Why AltAlpha
 
-Alternative datasets are often delayed, heterogeneous and easy to backtest incorrectly. AltAlpha is built around a simple research principle: **a strategy may only act on information that was actually public at that moment**.
+Alternative datasets are delayed, heterogeneous and easy to backtest incorrectly. AltAlpha is built around one core rule: **a strategy may only act on information that was actually public at that moment**.
 
-Every event therefore distinguishes:
+Every normalized event distinguishes:
 
-- `event_at` — when the underlying economic event happened;
-- `published_at` — when the market could observe it.
+- `event_at` — when the underlying economic event occurred;
+- `published_at` — when the information became publicly observable.
 
-The signal engine and backtester use `published_at` to reduce look-ahead bias.
+The signal engine uses `published_at` to reduce look-ahead bias.
 
 ```text
 Alternative data
@@ -37,9 +66,9 @@ Portfolio backtest
 Walk-forward / statistical validation
 ```
 
-## Alternative-data coverage
+## Data coverage
 
-AltAlpha contains collectors or normalized ingestion adapters for:
+AltAlpha contains live collectors or normalized ingestion adapters for:
 
 - SEC Form 4 insider transactions;
 - US House and Senate congressional trading disclosures;
@@ -53,15 +82,21 @@ AltAlpha contains collectors or normalized ingestion adapters for:
 - FINRA short-interest data;
 - corporate-flight events;
 - SEC Company Facts / earnings data;
-- earnings transcript imports.
+- earnings-transcript imports;
+- historical market prices for the configured watchlist and benchmark.
 
-Some feeds are live public APIs, while others intentionally use import adapters because historical or commercial-quality data may be gated, licensed or document-oriented. AltAlpha does not attempt to bypass source access controls.
+### Sync status
+
+Each source explicitly reports one of:
+
+- `synced` — the live collector or import completed;
+- `skipped` — optional API access or configuration is missing;
+- `missing_import` — a licensed/document-oriented source needs an export in `data/imports/`;
+- `error` — the source failed and the UI displays the error.
+
+AltAlpha does not silently replace gated or licensed datasets with fabricated data. Legally obtained exports placed in `data/imports/` are ingested automatically on the next sync.
 
 ## Quant research engine
-
-### Point-in-time event model
-
-Events are normalized into a common schema with source, issuer, actor, ticker, side, economic value, event timestamp and publication timestamp. This makes heterogeneous datasets comparable while preserving information availability.
 
 ### Multi-signal scoring
 
@@ -80,26 +115,32 @@ weights:
 
 ### Portfolio backtesting
 
-The daily portfolio simulator supports long-only or long/short portfolios, configurable holding periods, max-position sizing, gross/net exposure tracking, transaction costs, slippage, turnover and benchmark comparison.
+The daily portfolio simulator supports:
 
-Analytics include CAGR, annualized volatility, Sharpe, Sortino, Calmar, maximum drawdown, alpha, beta, Information Ratio, monthly/annual returns and equity/drawdown curves.
+- long-only or long/short portfolios;
+- configurable holding periods;
+- max-position sizing;
+- gross and net exposure tracking;
+- transaction costs and slippage;
+- turnover;
+- benchmark comparison.
+
+Analytics include CAGR, annualized volatility, Sharpe, Sortino, Calmar, maximum drawdown, alpha, beta, Information Ratio and monthly/annual returns.
 
 ### Risk model
 
-AltAlpha includes a **statistical PCA factor model** estimated from historical return windows, plus sector-exposure hooks from the security master. The risk layer calculates portfolio volatility, factor exposures, component-risk attribution and covariance matrices.
-
-This is intentionally a statistical research model rather than a commercial Barra-style factor model.
+AltAlpha includes a **statistical PCA factor model** estimated from historical return windows plus sector-exposure hooks from the security master. It calculates portfolio volatility, factor exposures and component-risk attribution.
 
 ### Constrained portfolio optimizer
 
-The SLSQP optimizer supports expected returns, covariance-based risk penalization, max-position constraints, gross-exposure limits, target net exposure, long-only / long-short bounds, turnover penalties, sector-constraint hooks and configurable risk aversion.
+The SLSQP optimizer supports expected returns, covariance-based risk penalization, max-position limits, gross exposure, target net exposure, long-only/long-short bounds, turnover penalties, sector-constraint hooks and configurable risk aversion.
 
 ### Anti-overfitting controls
 
 AltAlpha includes:
 
 - walk-forward out-of-sample testing;
-- Purged K-Fold split primitives;
+- Purged K-Fold primitives;
 - embargo around validation folds;
 - Probabilistic Sharpe Ratio;
 - Deflated Sharpe Ratio approximation;
@@ -107,112 +148,93 @@ AltAlpha includes:
 - cross-fold winner-stability diagnostics;
 - out-of-sample negative-fold diagnostics.
 
-The Alpha Discovery Lab compares combinations of alternative signals using out-of-sample results rather than only full-sample backtests.
+The **Alpha Discovery Lab** compares signal combinations using out-of-sample results instead of ranking only full-sample backtests.
 
 ## Security master
 
-The security-master layer is designed to associate ticker, CIK, CUSIP, FIGI, company name, sector, exchange, validity dates and active/delisted status. Corporate-action storage is included for splits and cash distributions.
+The security-master layer supports ticker, CIK, CUSIP, FIGI, company name, sector, exchange, validity dates and active/delisted status. Corporate-action storage is included for splits and cash distributions.
 
-For institutional-grade survivorship-bias control, the framework still requires a legally obtained point-in-time historical universe and delisted-security price database.
+For institutional-grade survivorship-bias control, a licensed point-in-time universe and delisted-security price database would still be required.
 
-## Web terminal
+## Responsive web terminal
 
-The FastAPI application serves a browser-based research terminal at `/` with:
+The browser terminal includes:
 
-- **Overview** — dataset status and research summary;
-- **Signals** — alternative-data screener;
+- **Overview** — dataset health, sync state and research summary;
+- **Signals** — cross-source alternative-data screener;
 - **Company view** — signal history by ticker;
-- **Backtest** — configurable portfolio simulations;
+- **Backtest** — configurable portfolio simulation and equity curve;
 - **Risk & Validation** — research controls and statistical diagnostics;
 - **Alpha Discovery** — walk-forward signal-combination research;
 - **Data Sources** — source inventory and event tape.
+
+The UI is responsive across desktop, tablet and mobile: navigation wraps, cards/forms collapse to a single column, charts remain fluid and dense tables use local horizontal scrolling.
 
 ## Architecture
 
 ```text
 app/
 ├── collectors/          # Alternative-data ingestion
-├── static/              # Web terminal
-├── main.py              # FastAPI application / endpoints
+├── static/              # Responsive web terminal
+├── main.py              # FastAPI API / web app
 ├── models.py            # SQLAlchemy data model
-├── strategy.py          # Event-level signal strategy engine
+├── sync_manager.py      # One-click source orchestration
+├── strategy.py          # Event-level signal engine
 ├── portfolio.py         # Daily portfolio simulator
 ├── risk_model.py        # PCA factor/risk model
-├── optimizer.py         # Constrained portfolio optimizer
+├── optimizer.py         # Constrained optimizer
 ├── validation.py        # PSR, DSR, bootstrap, purged CV
 ├── discovery.py         # Walk-forward alpha discovery
 ├── security_master.py   # Security identifiers / validity
-├── scheduler.py         # Collection scheduler foundation
+├── scheduler.py         # Scheduled collection foundation
 └── prices.py            # Development price-data adapter
 ```
 
 ## Tech stack
 
-Python · FastAPI · SQLAlchemy · PostgreSQL / SQLite · NumPy · pandas · SciPy · scikit-learn · statsmodels · APScheduler · HTML/CSS/JavaScript
+Python · FastAPI · SQLAlchemy · SQLite / PostgreSQL · NumPy · pandas · SciPy · scikit-learn · statsmodels · APScheduler · HTML/CSS/JavaScript
 
-## Quick start
+## Configuration
 
-```bash
-python -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-python -m app.cli init-db
-uvicorn app.main:app --reload
+Default watchlist:
+
+```env
+WATCHLIST=AAPL,MSFT,NVDA,AMZN,META,GOOGL,TSLA,PLTR,JPM,GS
+BOOTSTRAP_PRICE_YEARS=5
+AUTO_SYNC_ON_FIRST_RUN=true
 ```
 
-Open `http://127.0.0.1:8000` or Swagger at `http://127.0.0.1:8000/docs`.
-
-## Example collectors
-
-```bash
-python -m app.cli sec-form4 --count 100
-python -m app.cli sec-13f 1067983
-python -m app.cli lobbying --client "Palantir" --year 2026
-python -m app.cli contracts "Palantir" --days 730
-python -m app.cli bluesky "NVIDIA" --ticker NVDA
-python -m app.cli earnings 1045810 NVDA
-```
-
-## Import adapters
-
-```bash
-python -m app.cli import-congress data/imports/house.csv house
-python -m app.cli import-congress data/imports/senate.csv senate
-python -m app.cli import-patents data/imports/patents.csv
-python -m app.cli import-options data/imports/options.csv
-python -m app.cli import-short-interest data/imports/finra.txt
-python -m app.cli import-flights data/imports/flights.csv
-python -m app.cli import-transcripts data/imports/transcripts.csv
-```
-
-See `IMPORT_SCHEMAS.md` for expected columns.
-
-## PostgreSQL
-
-SQLite is the default development configuration. PostgreSQL can be used with:
+SQLite is the default local database. PostgreSQL is supported with:
 
 ```env
 DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/altalpha
 ```
 
+Swagger is available at `http://127.0.0.1:8000/docs`.
+
+## Tests
+
+The V0.7 local test suite currently covers point-in-time entry behaviour, optimizer constraints, statistical-validation utilities and sync-status persistence.
+
+```bash
+PYTHONPATH=. python -m pytest -q
+```
+
+Latest local validation before publication: **4 tests passed**.
+
 ## Research limitations
 
 AltAlpha deliberately does **not** claim institutional production infrastructure. Serious deployment would still require licensed point-in-time universe/pricing data including delisted securities, stronger corporate-action history, calibrated bid/ask and market-impact models, borrow costs, richer style/fundamental factors, capacity analysis, broker/OMS connectivity, operational monitoring and broader automated test coverage.
 
-The current project is best viewed as a **quantitative research laboratory for alternative data**.
-
-## License & third-party data
-
-The AltAlpha source code is released under the **MIT License**. See `LICENSE`.
-
-The MIT License applies to the code authored for this repository, **not** to third-party datasets, APIs, trademarks, filings or commercial market-data feeds. Users remain responsible for the terms, redistribution restrictions, attribution requirements and rate limits of each external source. See `NOTICE` for the third-party data and service notice.
-
-This repository does not intentionally redistribute proprietary historical market data, commercial options-flow datasets, licensed flight-history datasets or other third-party datasets without established redistribution rights.
+The project is best viewed as a **quantitative research laboratory for alternative data**.
 
 ## Interview summary
 
-> Built a Python-based quantitative research platform aggregating alternative datasets including insider transactions, congressional disclosures, institutional holdings, government contracts and options activity. Implemented point-in-time event normalization, multi-signal strategy construction, constrained portfolio backtesting, factor-risk analytics and walk-forward / multiple-testing-aware statistical validation, with a FastAPI research terminal for visualization.
+> Built a Python-based quantitative research platform aggregating alternative datasets including insider transactions, congressional disclosures, institutional holdings, government contracts and options activity. Implemented point-in-time event normalization, multi-signal strategy construction, constrained portfolio backtesting, factor-risk analytics and walk-forward / multiple-testing-aware statistical validation, with a responsive FastAPI research terminal and one-click local data synchronization.
+
+## License & third-party data
+
+AltAlpha source code is licensed under the **MIT License**. External datasets, APIs and imported files remain subject to the terms, licenses and redistribution rules of their respective providers. See `NOTICE` for details.
 
 ## Disclaimer
 
