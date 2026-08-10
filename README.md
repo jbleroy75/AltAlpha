@@ -77,7 +77,7 @@ V0.8 moves the default install toward a **clone → start → data arrives autom
 | Earnings facts | SEC Company Facts | automatic |
 | Lobbying | Senate LDA API | automatic |
 | Government contracts | USAspending | automatic |
-| Congress House / Senate | public keyless gateway sourced from official STOCK Act filings | automatic |
+| Congress House / Senate | public keyless gateway sourced from official STOCK Act filings | automatic, recent window |
 | Short interest | FINRA Consolidated Short Interest Query API | automatic |
 | Social mentions | Bluesky public API | automatic |
 | Historical prices | Stooq development adapter | automatic |
@@ -88,6 +88,8 @@ V0.8 moves the default install toward a **clone → start → data arrives autom
 | Earnings transcripts | normalized import adapter | no single official uniform transcript API |
 
 The first synchronization starts automatically when `AUTO_SYNC_ON_FIRST_RUN=true`. The **SYNC ALL DATA** button forces a refresh later.
+
+The keyless Congress connector intentionally syncs a **recent public Congress window** rather than claiming to be a complete historical Congress database. Each refresh is capped at **50 House + 50 Senate records** to respect the public gateway's keyless allowance. Historical Congress research can still be extended with official disclosures or legally obtained backfills.
 
 AltAlpha does **not** bundle raw third-party datasets in Git. Data is fetched into the user's local database. Sources that require credentials, licensed feeds or user-supplied exports are explicitly shown as `skipped` or `missing_import` instead of being silently substituted with fabricated data.
 
