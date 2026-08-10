@@ -1,0 +1,19 @@
+name: alt-data-composite
+sources: [sec_form4, congress_house, congress_senate, lda, usaspending, uspto, bluesky, finra_short_interest, options_flow, corporate_flights, sec_companyfacts, earnings_transcript]
+signal_lookback_days: 30
+holding_days: 20
+threshold: 2.5
+benchmark: SPY
+weights:
+  sec_form4: 1.5
+  congress_house: 1.2
+  congress_senate: 1.2
+  lda: 0.4
+  usaspending: 1.0
+  uspto: 0.3
+  bluesky: 0.2
+  finra_short_interest: -0.8
+  options_flow: 1.0
+  corporate_flights: 0.2
+  sec_companyfacts: 0.8
+  earnings_transcript: 0.5
