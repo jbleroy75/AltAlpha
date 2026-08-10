@@ -66,24 +66,30 @@ Portfolio backtest
 Walk-forward / statistical validation
 ```
 
-## Data coverage
+## Open-data-first synchronization
 
-AltAlpha contains live collectors or normalized ingestion adapters for:
+V0.8 moves the default install toward a **clone → start → data arrives automatically** workflow using public or openly accessible sources wherever practical.
 
-- SEC Form 4 insider transactions;
-- US House and Senate congressional trading disclosures;
-- SEC 13F institutional holdings;
-- US federal lobbying disclosures;
-- USAspending government-contract transactions;
-- patents / USPTO exports;
-- Google Trends adapter;
-- Bluesky / social sentiment;
-- options-flow imports;
-- FINRA short-interest data;
-- corporate-flight events;
-- SEC Company Facts / earnings data;
-- earnings-transcript imports;
-- historical market prices for the configured watchlist and benchmark.
+| Dataset | Default source | One-click status |
+|---|---|---|
+| SEC insiders | SEC EDGAR / Form 4 | automatic |
+| Institutional holdings | SEC 13F | automatic |
+| Earnings facts | SEC Company Facts | automatic |
+| Lobbying | Senate LDA API | automatic |
+| Government contracts | USAspending | automatic |
+| Congress House / Senate | public keyless gateway sourced from official STOCK Act filings | automatic |
+| Short interest | FINRA Consolidated Short Interest Query API | automatic |
+| Social mentions | Bluesky public API | automatic |
+| Historical prices | Stooq development adapter | automatic |
+| Patents | USPTO Open Data Portal / PatentsView | public data; account/API key required |
+| Google Trends | official API adapter | limited-access API |
+| Options flow | normalized import adapter | professional consolidated history is generally licensed |
+| Corporate flights | normalized import adapter | historical movement feeds may be access/licence constrained |
+| Earnings transcripts | normalized import adapter | no single official uniform transcript API |
+
+The first synchronization starts automatically when `AUTO_SYNC_ON_FIRST_RUN=true`. The **SYNC ALL DATA** button forces a refresh later.
+
+AltAlpha does **not** bundle raw third-party datasets in Git. Data is fetched into the user's local database. Sources that require credentials, licensed feeds or user-supplied exports are explicitly shown as `skipped` or `missing_import` instead of being silently substituted with fabricated data.
 
 ### Sync status
 
@@ -93,8 +99,6 @@ Each source explicitly reports one of:
 - `skipped` — optional API access or configuration is missing;
 - `missing_import` — a licensed/document-oriented source needs an export in `data/imports/`;
 - `error` — the source failed and the UI displays the error.
-
-AltAlpha does not silently replace gated or licensed datasets with fabricated data. Legally obtained exports placed in `data/imports/` are ingested automatically on the next sync.
 
 ## Quant research engine
 
@@ -202,6 +206,7 @@ Default watchlist:
 WATCHLIST=AAPL,MSFT,NVDA,AMZN,META,GOOGL,TSLA,PLTR,JPM,GS
 BOOTSTRAP_PRICE_YEARS=5
 AUTO_SYNC_ON_FIRST_RUN=true
+CONGRESS_PUBLIC_API_URL=https://www.bargo.ai/free-apis/congress/v1
 ```
 
 SQLite is the default local database. PostgreSQL is supported with:
@@ -214,13 +219,13 @@ Swagger is available at `http://127.0.0.1:8000/docs`.
 
 ## Tests
 
-The V0.7 local test suite currently covers point-in-time entry behaviour, optimizer constraints, statistical-validation utilities and sync-status persistence.
+The V0.8 local test suite covers point-in-time entry behaviour, optimizer constraints, statistical-validation utilities, sync-status persistence, Congress publication timing and FINRA short-interest normalization.
 
 ```bash
 PYTHONPATH=. python -m pytest -q
 ```
 
-Latest local validation before publication: **4 tests passed**.
+Latest local validation before publication: **6 tests passed**.
 
 ## Research limitations
 
@@ -235,6 +240,8 @@ The project is best viewed as a **quantitative research laboratory for alternati
 ## License & third-party data
 
 AltAlpha source code is licensed under the **MIT License**. External datasets, APIs and imported files remain subject to the terms, licenses and redistribution rules of their respective providers. See `NOTICE` for details.
+
+Congress data shown through the default public gateway requires provider attribution; the terminal displays that attribution. Raw congressional gateway records are fetched locally and are not redistributed in this repository.
 
 ## Disclaimer
 
