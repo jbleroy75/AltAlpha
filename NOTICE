@@ -10,6 +10,12 @@ Users are responsible for complying with each source's current terms of use, rat
 
 This repository does not include or redistribute proprietary historical market-data databases, commercial options-flow datasets, licensed flight-history datasets, or other datasets for which redistribution rights have not been established.
 
+Congressional disclosures: AltAlpha's default convenience connector uses Bargo's public Congress API, which states that its records are sourced from official US House Clerk and Senate eFD STOCK Act filings. Bargo requires attribution and restricts bulk redistribution of raw records. AltAlpha fetches these records into the user's local research database; the repository does not bundle or redistribute the raw dataset.
+
+FINRA Consolidated Short Interest is accessed through FINRA's public Query API. FINRA terms, rate limits and regulatory disclaimers remain applicable.
+
+USPTO patent information is public, but the USPTO Open Data Portal requires registration and API access requires an API key. AltAlpha therefore treats patent API access as optional and never bypasses those controls.
+
 Names and trademarks of third parties remain the property of their respective owners. Their mention describes interoperability or potential data sources and does not imply endorsement, affiliation, or sponsorship.
 
 AltAlpha is a research and educational framework. It is not investment advice, a broker, an execution venue, or a production trading system.
