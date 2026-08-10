@@ -11,17 +11,22 @@ def _amount_midpoint(value):
     if not nums:return None
     return sum(nums[:2])/min(len(nums),2)
 
-def collect(session:Session,chamber:str|None=None,days:int=90,max_pages:int=3)->int:
+def collect(session:Session,chamber:str|None=None,days:int=90,max_pages:int=1,page_size:int=50)->int:
     """
     Keyless public gateway for recent STOCK Act disclosures.
     Provider records are sourced from official House Clerk / Senate eFD filings.
     The local DB is for research use; raw records are not redistributed by AltAlpha.
+
+    The default page size is deliberately capped at 50 so one House + one Senate
+    sync stays within the public gateway's 100-row keyless allowance.
     """
     base=settings.congress_public_api_url.rstrip("/")+"/trades"
     since=(datetime.utcnow()-timedelta(days=days)).date().isoformat()
     inserted=0
+    page_size=max(1,min(int(page_size),50))
+    max_pages=max(1,int(max_pages))
     for page in range(max_pages):
-        params={"limit":100,"page":page,"from":since}
+        params={"limit":page_size,"page":page,"from":since}
         if chamber: params["chamber"]=chamber.lower()
         r=requests.get(base,params=params,timeout=45)
         r.raise_for_status()
@@ -45,5 +50,5 @@ def collect(session:Session,chamber:str|None=None,days:int=90,max_pages:int=3)->
                 event_at=dt(trade_date),published_at=dt(disclosure),
                 url=x.get("filing_portal") or x.get("filing_url"),
                 raw_json=json.dumps({"provider":"Bargo public Congress API",**x},default=str))
-        if len(rows)<100:break
+        if len(rows)<page_size:break
     return inserted
