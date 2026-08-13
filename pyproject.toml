@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "altalpha"
-version = "0.7.0"
-description = "Alternative-data quantitative research terminal"
+version = "0.8.0"
+description = "Open-data-first alternative-data quantitative research terminal"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}

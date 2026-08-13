@@ -72,32 +72,33 @@ def run_sync(run_id:int):
                     from .collectors.google_trends import collect
                     for a in aliases[:15]:inserted+=collect(s,a.alias,a.ticker)
                 elif source=="congress_house":
-                    p=_first_existing("house.csv","congress_house.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place house.csv in data/imports/.");continue
-                    from .collectors.importers import import_congress;inserted=import_congress(s,p,"house")
+                    from .collectors.congress_public import collect
+                    inserted=collect(s,"house",90,1,50)
                 elif source=="congress_senate":
-                    p=_first_existing("senate.csv","congress_senate.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place senate.csv in data/imports/.");continue
-                    from .collectors.importers import import_congress;inserted=import_congress(s,p,"senate")
+                    from .collectors.congress_public import collect
+                    inserted=collect(s,"senate",90,1,50)
                 elif source=="uspto":
                     p=_first_existing("patents.csv","uspto.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place patents.csv in data/imports/.");continue
-                    from .collectors.importers import import_patents;inserted=import_patents(s,p)
+                    if p:
+                        from .collectors.importers import import_patents;inserted=import_patents(s,p)
+                    elif not settings.uspto_api_key:
+                        _finish(s,row,"skipped",0,"USPTO patent data is public, but ODP API access now requires a USPTO account/API key. Set USPTO_API_KEY or place patents.csv in data/imports/.");continue
+                    else:
+                        _finish(s,row,"skipped",0,"USPTO_API_KEY detected. Place an ODP export in data/imports/patents.csv until the account-specific ODP endpoint is configured.");continue
                 elif source=="options_flow":
                     p=_first_existing("options.csv","options_flow.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place options.csv in data/imports/.");continue
+                    if not p:_finish(s,row,"missing_import",0,"Consolidated professional options-flow history is generally licensed. Place a legally obtained options.csv in data/imports/.");continue
                     from .collectors.importers import import_options;inserted=import_options(s,p)
                 elif source=="finra_short_interest":
-                    p=_first_existing("finra.txt","finra.csv","short_interest.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place FINRA short-interest export in data/imports/.");continue
-                    from .collectors.short_interest import import_finra;inserted=import_finra(s,p)
+                    from .collectors.finra_live import collect
+                    inserted=collect(s,[a.ticker for a in aliases[:25]],100)
                 elif source=="corporate_flights":
                     p=_first_existing("flights.csv","corporate_flights.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place flights.csv in data/imports/ and map aircraft first.");continue
+                    if not p:_finish(s,row,"missing_import",0,"Place a legally obtained flights.csv in data/imports/ and map aircraft first.");continue
                     from .collectors.flights import import_flights;inserted=import_flights(s,p)
                 elif source=="earnings_transcript":
                     p=_first_existing("transcripts.csv","earnings_transcripts.csv")
-                    if not p:_finish(s,row,"missing_import",0,"Place transcripts.csv in data/imports/.");continue
+                    if not p:_finish(s,row,"missing_import",0,"No uniform official transcript API is available. Place a legally obtained transcripts.csv in data/imports/.");continue
                     from .collectors.importers import import_transcripts;inserted=import_transcripts(s,p)
                 elif source=="market_prices":
                     from datetime import timedelta
